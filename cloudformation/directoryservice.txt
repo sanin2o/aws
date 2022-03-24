@@ -1,0 +1,13 @@
+aws workspaces register-workspace-directory \
+  --directory-id DIRECTORY_ID \
+  --subnet-ids 'SUBNET_ID_1' 'SUBNET_ID_2' \
+  --enable-work-docs \
+  --no-enable-self-service
+
+aws workdocs create-user \
+  --organization-id DIRECTORY_ID \
+  --username USERNAME \
+  --email-address EMAIL \
+  --given-name NAME \
+  --surname SURNAME \
+  --password PASSWORD

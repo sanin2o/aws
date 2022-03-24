@@ -1,0 +1,30 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  WorkSpaceUser:
+    Type: String
+  DirectoryId:
+    Type: String
+  BundleId:
+    Type: String
+    AllowedValues:
+      - "wsb-fb2xfp6r8" # VALUE
+      - "wsb-6cbvhvv9f" # STANDARD
+      - "wsb-55rrhyyg1" # PERFORMANCE
+      - "wsb-g72p36ch9" # POWER
+
+Resources:
+  WorkSpace:
+    Type: AWS::WorkSpaces::Workspace
+    Properties:
+      BundleId: !Ref BundleId
+      DirectoryId: !Ref DirectoryId
+      RootVolumeEncryptionEnabled: true
+      UserName: !Ref WorkSpaceUser
+      UserVolumeEncryptionEnabled: true
+      VolumeEncryptionKey: "alias/aws/workspaces"
+      WorkspaceProperties:
+        RootVolumeSizeGib: 80
+        UserVolumeSizeGib: 10
+        RunningMode: "AUTO_STOP"
+        RunningModeAutoStopTimeoutInMinutes: 60

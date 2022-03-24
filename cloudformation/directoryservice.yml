@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+  SubnetId1:
+    Type: AWS::EC2::Subnet::Id
+  SubnetId2:
+    Type: AWS::EC2::Subnet::Id
+  DirectoryName:
+    Type: String
+  DirectoryPassword:
+    Type: String
+    NoEcho: true
+  DirectorySize:
+    Type: String
+    Default: "Small"
+    AllowedValues:
+      - "Small"
+      - "Large"
+
+Resources:
+  SimpleDirectory:
+    Type: AWS::DirectoryService::SimpleAD
+    Properties:
+      Name: !Ref DirectoryName
+      Password: !Ref DirectoryPassword
+      Size: !Ref DirectorySize
+      VpcSettings:
+        SubnetIds:
+          - !Ref SubnetId1
+          - !Ref SubnetId2
+        VpcId: !Ref VpcId
