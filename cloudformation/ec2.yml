@@ -1,0 +1,74 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  KeyName:
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the instance
+    Type: AWS::EC2::KeyPair::KeyName
+  VpcId:
+    Description: The ID of the VPC
+    Type: AWS::EC2::VPC::Id
+  InstanceType:
+    Description: EC2 instance type
+    Type: String
+    Default: t4g.micro
+    AllowedValues:
+      - t4g.micro
+
+Mappings:
+  AWSRegion2AMI:
+    eu-central-1:
+      AMI: ami-0d1745d072234b13f
+
+Resources:
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable SSH access via port 22
+      GroupName: !Sub ${AWS::StackName}-sg
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0
+      VpcId: !Ref VpcId
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-sg
+        - Key: Project
+          Value: !Sub ${AWS::StackName}
+
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType:
+        !Ref InstanceType
+      SecurityGroupIds:
+        - !Ref InstanceSecurityGroup
+      KeyName:
+        !Ref KeyName
+      ImageId:
+        !FindInMap
+        - AWSRegion2AMI
+        - !Ref AWS::Region
+        - AMI
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            Encrypted: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-ec2
+        - Key: Project
+          Value: !Sub ${AWS::StackName}
+
+Outputs:
+  PublicDNS:
+    Description: Public DNSName of the EC2 instance
+    Value: !GetAtt
+      - EC2Instance
+      - PublicDnsName
+  PublicIP:
+    Description: Public IP address of the EC2 instance
+    Value: !GetAtt
+      - EC2Instance
+      - PublicIp
